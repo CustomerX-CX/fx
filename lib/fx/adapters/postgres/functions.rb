@@ -10,8 +10,25 @@ module Fx
         # dumpable into `db/schema.rb`.
         FUNCTIONS_WITH_DEFINITIONS_QUERY = <<-EOS.freeze
           SELECT
-              pp.proname AS name,
-              pg_get_functiondef(pp.oid) AS definition
+            pp.proname AS name,
+            
+            case when pa.aggfnoid is not null
+              then
+              format('CREATE AGGREGATE %s (SFUNC = %s, STYPE = %s%s%s%s%s)'
+                  , aggfnoid::regprocedure
+                  , aggtransfn
+                  , aggtranstype::regtype
+                  , ', SORTOP = '    || NULLIF(aggsortop, 0)::regoper
+                  , ', INITCOND = '  || agginitval
+                  , ', FINALFUNC = ' || NULLIF(aggfinalfn, 0)
+                  , CASE WHEN aggfinalextra THEN ', FINALFUNC_EXTRA' END
+                    ) 
+              else
+              pg_get_functiondef(pp.oid)
+            end
+          
+                AS definition
+              
           FROM pg_proc pp
           JOIN pg_namespace pn
               ON pn.oid = pp.pronamespace
@@ -19,7 +36,8 @@ module Fx
               ON pd.objid = pp.oid AND pd.deptype = 'e'
           LEFT JOIN pg_aggregate pa
               ON pa.aggfnoid = pp.oid
-          WHERE pn.nspname = 'public' AND pd.objid IS NULL
+              
+          WHERE pn.nspname = 'public' AND pd.objid IS null
           ORDER BY pp.oid;
         EOS
 

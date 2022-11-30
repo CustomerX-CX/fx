@@ -31,9 +31,7 @@ module Fx
       private
 
       def dumpable_functions_in_database
-        @_dumpable_functions_in_database ||= Fx.database.functions.reject do |function|
-          ignored?(function.name)
-        end
+        @_dumpable_functions_in_database ||= Fx.database.functions
       end
     end
   end
