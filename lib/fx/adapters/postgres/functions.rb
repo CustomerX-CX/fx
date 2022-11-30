@@ -20,7 +20,6 @@ module Fx
           LEFT JOIN pg_aggregate pa
               ON pa.aggfnoid = pp.oid
           WHERE pn.nspname = 'public' AND pd.objid IS NULL
-              AND pa.aggfnoid IS NULL
           ORDER BY pp.oid;
         EOS
 
