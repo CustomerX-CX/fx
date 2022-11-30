@@ -24,7 +24,7 @@ module Fx
                   , CASE WHEN aggfinalextra THEN ', FINALFUNC_EXTRA' END
                     ) 
               else
-              pg_get_functiondef(pp.oid)
+                replace(pg_get_functiondef(pp.oid), 'public.', '')
             end
           
                 AS definition
