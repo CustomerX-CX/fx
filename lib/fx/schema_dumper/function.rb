@@ -25,15 +25,15 @@ module Fx
       def functions(stream)
         dumpable_functions_in_database.each do |function|
           stream.puts(function.to_schema)
-        rescue StandardError
-          nil
         end
       end
 
       private
 
       def dumpable_functions_in_database
-        @_dumpable_functions_in_database ||= Fx.database.functions
+        @_dumpable_functions_in_database ||= Fx.database.functions.reject do |function|
+          ignored?(function.name)
+        end
       end
     end
   end
