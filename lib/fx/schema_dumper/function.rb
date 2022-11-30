@@ -25,6 +25,8 @@ module Fx
       def functions(stream)
         dumpable_functions_in_database.each do |function|
           stream.puts(function.to_schema)
+        rescue StandardError
+          nil
         end
       end
 
